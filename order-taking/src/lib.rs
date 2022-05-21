@@ -70,7 +70,7 @@ pub mod public_types {
     pub struct BillableOrderPlaced {}
     pub struct OrderAcknowledgmentSent {}
 
-    #[derive(Clone)]
+    #[derive(Clone, PartialEq, Eq)]
     pub struct ProductCode(String);
 
     impl ProductCode {
@@ -239,13 +239,24 @@ pub mod implementation {
 
     #[cfg(test)]
     mod tests {
+        use std::{ops::RangeBounds, sync::Arc};
+
         use crate::public_types::*;
+        use anyhow::anyhow;
 
         use super::place_order;
 
         #[test]
         fn it_works() {
-            let check_product_exists = |code: &ProductCode| Ok(());
+            let our_code = ProductCode::new("fake-code".into());
+            let product_ids = Arc::new(vec![our_code]);
+
+            let check_product_exists = |code: &ProductCode| {
+                if product_ids.contains(&code) {
+                    return Ok(());
+                }
+                return Err(anyhow!("not found!"));
+            };
             let unvalidated_order_line = UnvalidatedOrderLine {
                 order_line_id: "fake-line-id".into(),
                 product_code: "fake-code".into(),
