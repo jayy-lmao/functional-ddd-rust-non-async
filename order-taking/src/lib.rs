@@ -239,7 +239,7 @@ pub mod implementation {
 
     #[cfg(test)]
     mod tests {
-        use std::{ops::RangeBounds, sync::Arc};
+        use std::sync::Arc;
 
         use crate::public_types::*;
         use anyhow::anyhow;
